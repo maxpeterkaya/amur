@@ -3,14 +3,16 @@ package main
 import (
 	"errors"
 	"fmt"
-	"github.com/rs/zerolog/log"
-	"golang.org/x/image/draw"
 	"image"
 	"image/jpeg"
 	"image/png"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/rs/zerolog/log"
+	"golang.org/x/image/draw"
+	"golang.org/x/image/webp"
 )
 
 func Exists(path string) bool {
@@ -99,9 +101,7 @@ func ThumbnailImage(filePath string) (string, error) {
 	}
 	defer output.Close()
 
-	var (
-		src image.Image
-	)
+	var src image.Image
 
 	if fileExt == ".png" {
 		src, err = png.Decode(input)
@@ -113,6 +113,12 @@ func ThumbnailImage(filePath string) (string, error) {
 		src, err = jpeg.Decode(input)
 		if err != nil {
 			log.Error().Err(err).Str("path", filePath).Str("util", "resize").Msg("failed to decode jpeg")
+			return "", err
+		}
+	} else if fileExt == ".webp" {
+		src, err = webp.Decode(input)
+		if err != nil {
+			log.Error().Err(err).Str("path", filePath).Str("util", "resize").Msg("failed to decode webp")
 			return "", err
 		}
 	}
@@ -186,14 +192,16 @@ func ReadLimitedBytes(path string, n int) []byte {
 	file, err := os.Open(path)
 
 	if err != nil {
-		panic(err)
+		log.Error().Err(err).Str("path", path).Msg("failed to open file")
+		return make([]byte, 0)
 	}
 	defer file.Close()
 
 	bytes := make([]byte, n)
 	m, err := file.Read(bytes)
 	if err != nil {
-		panic(err)
+		log.Error().Err(err).Str("path", path).Msg("failed to read file")
+		return make([]byte, 0)
 	}
 
 	return bytes[:m]
