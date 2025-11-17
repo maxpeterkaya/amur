@@ -3,14 +3,16 @@ package main
 import (
 	"errors"
 	"fmt"
-	"github.com/rs/zerolog/log"
-	"golang.org/x/image/draw"
 	"image"
 	"image/jpeg"
 	"image/png"
 	"os"
+	"path"
 	"path/filepath"
 	"strings"
+
+	"github.com/rs/zerolog/log"
+	"golang.org/x/image/draw"
 )
 
 func Exists(path string) bool {
@@ -20,6 +22,23 @@ func Exists(path string) bool {
 		return false
 	}
 	return true
+}
+
+func CreateEssentialFolders() error {
+	folders := []string{
+		"files",
+		"images",
+		"videos",
+	}
+
+	for _, folder := range folders {
+		err := os.MkdirAll(path.Join(Config.PublicFolder, folder), os.ModePerm)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func ResizeImage(filePath string, width int, height int) (string, error) {
@@ -55,6 +74,8 @@ func ResizeImage(filePath string, width int, height int) (string, error) {
 			log.Error().Err(err).Str("path", filePath).Str("util", "resize").Msg("failed to decode jpeg")
 			return "", err
 		}
+	} else {
+		return "", nil
 	}
 
 	dst := image.NewRGBA(image.Rect(0, 0, width, height))
@@ -99,9 +120,7 @@ func ThumbnailImage(filePath string) (string, error) {
 	}
 	defer output.Close()
 
-	var (
-		src image.Image
-	)
+	var src image.Image
 
 	if fileExt == ".png" {
 		src, err = png.Decode(input)
@@ -115,6 +134,8 @@ func ThumbnailImage(filePath string) (string, error) {
 			log.Error().Err(err).Str("path", filePath).Str("util", "resize").Msg("failed to decode jpeg")
 			return "", err
 		}
+	} else {
+		return "", nil
 	}
 
 	dst := image.NewRGBA(image.Rect(0, 0, src.Bounds().Max.X/2, src.Bounds().Max.Y/2))
