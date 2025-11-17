@@ -60,30 +60,28 @@ sboms:
 checksum:
   name_template: 'checksums.txt'
 
-signs:
-  - cmd: cosign
-    env:
-      - COSIGN_EXPERIMENTAL=1
-    certificate: '${artifact}.pem'
-    args:
-      - sign-blob
-      - '-y'
-      - '--output-certificate=${certificate}'
-      - '--output-signature=${signature}'
-      - '${artifact}'
-    artifacts: checksum
-    output: true
-
-docker_signs:
-  - cmd: cosign
-    env:
-      - COSIGN_EXPERIMENTAL=1
-    artifacts: manifests
-    output: true
-    args:
-      - 'sign'
-      - '-y'
-      - '${artifact}'
+#signs:
+#  - cmd: cosign
+#    certificate: '${artifact}.pem'
+#    args:
+#      - sign-blob
+#      - '-y'
+#      - '--output-certificate=${certificate}'
+#      - '--output-signature=${signature}'
+#      - '${artifact}'
+#    artifacts: checksum
+#    output: true
+#
+#docker_signs:
+#  - cmd: cosign
+#    env:
+#      - COSIGN_EXPERIMENTAL=1
+#    artifacts: manifests
+#    output: true
+#    args:
+#      - 'sign'
+#      - '-y'
+#      - '${artifact}'
 
 changelog:
   sort: asc
