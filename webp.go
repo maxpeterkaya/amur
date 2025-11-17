@@ -2,11 +2,12 @@ package main
 
 import (
 	"errors"
-	"github.com/rs/zerolog/log"
 	"os"
 	"os/exec"
 	"path"
 	"strings"
+
+	"github.com/rs/zerolog/log"
 )
 
 func EncodeWebP(filePath string) (*string, error) {
@@ -15,6 +16,10 @@ func EncodeWebP(filePath string) (*string, error) {
 	}
 
 	ext := path.Ext(filePath)
+
+	if ext == ".webp" {
+		return nil, nil
+	}
 
 	if ext != ".jpg" && ext != ".png" && ext != ".jpeg" {
 		return nil, errors.New("not an image")
