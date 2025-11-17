@@ -34,6 +34,10 @@ func init() {
 	ConfigNew()
 
 	NewAsynqClient()
+
+	if err := CreateEssentialFolders(); err != nil {
+		log.Error().Err(err).Msg("Error creating folders")
+	}
 }
 
 func main() {
