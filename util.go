@@ -207,14 +207,16 @@ func ReadLimitedBytes(path string, n int) []byte {
 	file, err := os.Open(path)
 
 	if err != nil {
-		panic(err)
+		log.Error().Err(err).Str("path", path).Msg("failed to open file")
+		return make([]byte, 0)
 	}
 	defer file.Close()
 
 	bytes := make([]byte, n)
 	m, err := file.Read(bytes)
 	if err != nil {
-		panic(err)
+		log.Error().Err(err).Str("path", path).Msg("failed to read file")
+		return make([]byte, 0)
 	}
 
 	return bytes[:m]
