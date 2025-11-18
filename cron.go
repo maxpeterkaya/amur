@@ -1,9 +1,10 @@
 package main
 
 import (
-	"github.com/rs/zerolog/log"
 	"path"
 	"strings"
+
+	"github.com/rs/zerolog/log"
 
 	"os"
 	"path/filepath"
@@ -31,9 +32,13 @@ func CheckFiles() {
 			in, _ := os.Stat(webp)
 
 			if (!exists || in.Size() == 0) && CheckFileExtension(p) == "image" {
-				file, err2 := EncodeWebP(p)
-				if err2 != nil {
-					log.Error().Err(err2).Msg("failed to encode file")
+				file, err := EncodeWebP(p)
+				if err != nil {
+					log.Error().Err(err).Msg("failed to encode file")
+					return nil
+				}
+
+				if file == nil {
 					return nil
 				}
 
@@ -46,6 +51,6 @@ func CheckFiles() {
 		return nil
 	})
 	if err != nil {
-		log.Fatal().Err(err)
+		log.Error().Err(err).Msg("failed to walk public folder")
 	}
 }
