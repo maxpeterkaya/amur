@@ -22,19 +22,25 @@ func CronInit() {
 func CheckFiles() {
 	err := filepath.Walk(Config.PublicFolder, func(p string, info os.FileInfo, err error) error {
 		if err != nil {
-			log.Error().Err(err)
+			log.Error().Str("source", "cron").Err(err).Msg("filepath.Walk")
 			return err
 		}
 
 		if !info.IsDir() {
+			isImage := CheckFileExtension(p) == "image"
+
+			if !isImage {
+				return nil
+			}
+
 			webp := strings.Replace(p, path.Ext(p), ".webp", -1)
 			exists := Exists(webp)
 			in, _ := os.Stat(webp)
 
-			if (!exists || in.Size() == 0) && CheckFileExtension(p) == "image" {
+			if !exists || in.Size() == 0 {
 				file, err := EncodeWebP(p)
 				if err != nil {
-					log.Error().Err(err).Msg("failed to encode file")
+					log.Error().Str("source", "cron").Err(err).Msg("failed to encode file")
 					return nil
 				}
 
@@ -42,7 +48,17 @@ func CheckFiles() {
 					return nil
 				}
 
-				log.Info().Str("file", *file).Msg("encoded image")
+				log.Info().Str("source", "cron").Str("file", *file).Msg("encoded image")
+
+				return nil
+			}
+
+			if !strings.Contains(p, "_thumb") {
+				_, err := ThumbnailImage(p)
+				if err != nil {
+					log.Error().Str("source", "cron").Err(err).Msg("failed to encode thumbnail image")
+					return err
+				}
 
 				return nil
 			}
