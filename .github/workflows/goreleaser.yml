@@ -15,7 +15,7 @@ jobs:
       contents: write
       id-token: write
       packages: write
-    runs-on: docker
+    runs-on: arch
     env:
       DOCKER_CLI_EXPERIMENTAL: "enabled"
     steps:
