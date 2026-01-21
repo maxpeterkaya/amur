@@ -45,7 +45,7 @@ RUN cp --parents "$(ldd /usr/bin/ffmpeg | grep 'ld-linux' | awk '{print $1}')" /
 RUN ldd /usr/bin/ffprobe | awk '{print $3}' | grep '^/' | xargs -I '{}' cp --parents -v '{}' /export/
 RUN cp --parents "$(ldd /usr/bin/ffprobe | grep 'ld-linux' | awk '{print $1}')" /export/
 
-FROM cgr.dev/chainguard/static@sha256:288b818c1b3dd89776d176f07f5f671b118fe836c4d80ec2cc3299b596fe71b7
+FROM scratch
 
 # copy binary
 COPY /amur /usr/bin/amur
@@ -53,4 +53,5 @@ COPY /amur /usr/bin/amur
 # copy binaries and libraries
 COPY --from=packages /export/ /
 
+EXPOSE 3000
 ENTRYPOINT ["/usr/bin/amur"]
