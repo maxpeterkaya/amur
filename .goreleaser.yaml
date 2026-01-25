@@ -1,4 +1,16 @@
 project_name: amur
+version: 2
+force_token: gitea
+
+gitea_urls:
+  api: https://vc.maxkaya.com/api/v1
+  download: https://vc.maxkaya.com
+  skip_tls_verify: true
+
+release:
+  gitea:
+    owner: maxpeterkaya
+    name: amur
 
 before:
   hooks:
@@ -21,62 +33,43 @@ builds:
     goarm:
       - 6
       - 7
+    binary: amur
 
-dockers:
-  - image_templates:
-      - "ghcr.io/maxpeterkaya/{{ .ProjectName }}:{{ .Version }}-amd64"
-    dockerfile: Dockerfile
-    use: buildx
-    build_flag_templates:
-      - --platform=linux/amd64
-      - --label=org.opencontainers.image.licenses=MIT
-      - --label=org.opencontainers.image.description=amur
-      - --label=org.opencontainers.image.created={{.Date}}
-      - --label=org.opencontainers.image.name={{.ProjectName}}
-      - --label=org.opencontainers.image.revision={{.FullCommit}}
-      - --label=org.opencontainers.image.version={{.Version}}
-      - --label=org.opencontainers.image.source={{.GitURL}}
-      - --label=io.artifacthub.package.maintainers=[{"name":"maxpeterkaya","email":"git@maxpeterkaya.com"}]
-      - --label=io.artifacthub.package.readme-url=https://raw.githubusercontent.com/maxpeterkaya/amur/main/README.md
-      - --label=io.artifacthub.package.keywords=golang,image,uploader,redis,caching,streaming,performance,hls,cdn,high-performance,webp,media-delivery,image-optimization,content-delivery,thumbnail-generation,go-echo,video-optimization,lightweight-cdn,load-time-reduction,media-optimization
-      - --label=io.artifacthub.package.license=MIT
+archives:
+  - id: binary
+    formats: ["binary"]
+    name_template: "amur_{{ .Os }}_{{ .Arch }}{{ with .Arm }}v{{ . }}{{ end }}{{ with .Mips }}_{{ . }}{{ end }}{{ if not (eq .Amd64 \"v1\") }}{{ .Amd64 }}{{ end }}"
 
-docker_manifests:
-  - name_template: 'ghcr.io/maxpeterkaya/{{ .ProjectName }}:{{ .Version }}'
-    image_templates:
-      - 'ghcr.io/maxpeterkaya/{{ .ProjectName }}:{{ .Version }}-amd64'
-  - name_template: 'ghcr.io/maxpeterkaya/{{ .ProjectName }}:latest'
-    image_templates:
-      - 'ghcr.io/maxpeterkaya/{{ .ProjectName }}:{{ .Version }}-amd64'
+  - id: tar
+    formats: ["tar.gz"]
+
+dockers_v2:
+  - id: web-proxy
+    ids:
+      - binary
+      - amur
+    images:
+      - "vc.maxkaya.com/maxpeterkaya/amur"
+    tags:
+      - "v{{ .Version }}"
+      - "{{ .Version }}"
+      - "latest"
+    labels:
+      "org.opencontainers.image.description": "{{.ProjectName}}"
+      "org.opencontainers.image.created": "{{.Date}}"
+      "org.opencontainers.image.name": "{{.ProjectName}}"
+      "org.opencontainers.image.revision": "{{.FullCommit}}"
+      "org.opencontainers.image.version": "{{.Version}}"
+      "org.opencontainers.image.source": "{{.GitURL}}"
+    platforms:
+      - linux/amd64
+    sbom: "{{ not .IsNightly }}"
 
 source:
   enabled: true
 
 checksum:
   name_template: 'checksums.txt'
-
-#signs:
-#  - cmd: cosign
-#    certificate: '${artifact}.pem'
-#    args:
-#      - sign-blob
-#      - '-y'
-#      - '--output-certificate=${certificate}'
-#      - '--output-signature=${signature}'
-#      - '${artifact}'
-#    artifacts: checksum
-#    output: true
-#
-#docker_signs:
-#  - cmd: cosign
-#    env:
-#      - COSIGN_EXPERIMENTAL=1
-#    artifacts: manifests
-#    output: true
-#    args:
-#      - 'sign'
-#      - '-y'
-#      - '${artifact}'
 
 changelog:
   sort: asc
