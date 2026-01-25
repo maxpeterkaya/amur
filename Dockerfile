@@ -32,11 +32,10 @@ RUN cp --parents "$(ldd /usr/bin/ffprobe | grep 'ld-linux' | awk '{print $1}')" 
 
 FROM scratch
 
-# copy binary
-COPY amur /usr/bin/amur
+ARG TARGETPLATFORM
 
-# copy all binaries and libraries
-COPY --from=packages /export/ /
+ENTRYPOINT ["/usr/bin/amur"]
+
+COPY $TARGETPLATFORM/amur /usr/bin/
 
 EXPOSE 3000
-ENTRYPOINT ["/usr/bin/amur"]
