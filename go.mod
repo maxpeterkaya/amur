@@ -11,7 +11,7 @@ require (
 	github.com/labstack/echo/v4 v4.15.0
 	github.com/rs/zerolog v1.34.0
 	github.com/u2takey/ffmpeg-go v0.5.0
-	golang.org/x/image v0.34.0
+	golang.org/x/image v0.35.0
 )
 
 require (
