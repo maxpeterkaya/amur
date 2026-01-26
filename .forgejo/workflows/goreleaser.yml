@@ -12,7 +12,7 @@ jobs:
     if: ${{ !contains(github.ref, '-dev') }}
 
     container:
-      image: node:20-alpine
+      image: node:25-alpine
       options: --privileged
 
     runs-on: arch
