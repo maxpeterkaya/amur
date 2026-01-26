@@ -1,4 +1,4 @@
-FROM debian:bookworm AS packages
+FROM debian:trixie AS packages
 
 # create neccassry folder structure
 RUN mkdir -p /export/usr/bin
