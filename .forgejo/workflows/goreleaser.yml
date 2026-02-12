@@ -32,7 +32,7 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Docker Login
-        uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567 # v3.3.0
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3.7.0
         with:
           registry: vc.maxkaya.com
           username: maxpeterkaya
