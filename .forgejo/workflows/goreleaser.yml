@@ -51,7 +51,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-go-
       - name: Run GoReleaser
-        uses: https://vc.maxkaya.com/workflows/goreleaser-action@v6
+        uses: https://vc.maxkaya.com/workflows/goreleaser-action@v7
         with:
           distribution: goreleaser
           version: latest
